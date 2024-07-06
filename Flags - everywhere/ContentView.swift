@@ -32,15 +32,16 @@ struct ContentView: View {
     
     var body: some View {
         ZStack {
+                
             
                 MeshGradient(width: 3, height: 3, points: [
                     [0, 0], [0.5, 0], [1, 0],
                     [0, 0.5], [0.5, 0.5], [1, 0.5],
                     [0, 1], [0.5, 1], [1, 1]
                 ], colors: [
-                    .cyan, .blue, .blue,
-                    .white, .white, .red,
-                    .cyan, .green, .green
+                    isAnswerCorrect ?? true ? .green : .red, isAnswerCorrect ?? true ? .green : .red, .white,
+                    .white, .white, .white,
+                    .white, isAnswerCorrect ?? true ? .green : .red, isAnswerCorrect ?? true ? .green : .red
                 ])
                 .ignoresSafeArea()
             
@@ -67,15 +68,14 @@ struct ContentView: View {
                                 flagTapped(number)
                                 isAnswered = true
                             } label: {
-                                Image(countries[number])
-                                    .cornerRadius(23)
-                                    .shadow(radius: 5)
+                                FlagImage(index: number, countries: countries)
                                  
                                   
                             }
                             
                         }
                         .animation(.easeInOut(duration: 1))
+                        
                         
                         ZStack {
                             RoundedRectangle(cornerRadius: 20)
@@ -99,7 +99,7 @@ struct ContentView: View {
                         
                         
                         
-                    }
+                    }.padding(.top)
                     
                 }
                 
@@ -120,11 +120,9 @@ struct ContentView: View {
                         askQuestion()
                         currentScore = 0
                         holder = ""
+                        isAnswerCorrect = true
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.white.opacity(0.4))
-                    .cornerRadius(20)
-                    .shadow(radius: 10)
+                    .buttonStyle()
                     
                 }
                 .animation(.bouncy)
@@ -155,7 +153,32 @@ struct ContentView: View {
     }
 }
 
+struct FlagImage: View {
+    var index: Int
+    var countries: [String]
+    
+    var body: some View {
+        Image(countries[index])
+            .cornerRadius(23)
+            .shadow(radius: 5)
+    }
+}
 
+struct ButtonViewModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+        .buttonStyle(.borderedProminent)
+        .tint(.white.opacity(0.4))
+        .cornerRadius(20)
+        .shadow(radius: 10)
+    }
+}
+
+extension View {
+    func buttonStyle() -> some View {
+        modifier(ButtonViewModifier())
+    }
+}
 
 #Preview {
     ContentView()
