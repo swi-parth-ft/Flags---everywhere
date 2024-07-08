@@ -18,8 +18,10 @@ struct ContentView: View {
     @State private var isAnswerCorrect: Bool?
     
     @State private var isAnswered: Bool = false
-    
+    @State private var isTapped: Bool = false
     @State private var holder: String = ""
+    @State private var index: Int? = nil
+    
     var gradient = MeshGradient(width: 3, height: 3, points: [
         [0, 0], [0.5, 0], [1, 0],
         [0, 0.5], [0.5, 0.5], [1, 0.5],
@@ -30,6 +32,7 @@ struct ContentView: View {
         .cyan, .green, .green
     ])
     
+    @State var currectIndex: Int = 0
     var body: some View {
         ZStack {
                 
@@ -67,10 +70,11 @@ struct ContentView: View {
                             Button {
                                 flagTapped(number)
                                 isAnswered = true
+                                isTapped = true
+                                index = number
                             } label: {
-                                FlagImage(index: number, countries: countries)
-                                 
-                                  
+                                FlagImage(index: number, countries: countries, currectIndex: currectIndex, tapped: isTapped, tappedIndex: index)
+                                
                             }
                             
                         }
@@ -107,6 +111,8 @@ struct ContentView: View {
                     Button("Next", systemImage: "arrow.forward") {
                         askQuestion()
                         holder = ""
+                        isTapped = false
+                        index = nil
                     }
                     .frame(height: isAnswered ? nil : 0)
                     .buttonStyle(.borderedProminent)
@@ -121,6 +127,7 @@ struct ContentView: View {
                         currentScore = 0
                         holder = ""
                         isAnswerCorrect = true
+                        isTapped = false
                     }
                     .buttonStyle()
                     
@@ -136,6 +143,7 @@ struct ContentView: View {
             currentScore += 1
             isAnswerCorrect = true
             holder = "Correct"
+            currectIndex = number
         } else {
             scoreTitle = "Wrong"
             currentScore -= 1
@@ -156,11 +164,29 @@ struct ContentView: View {
 struct FlagImage: View {
     var index: Int
     var countries: [String]
+    var currectIndex: Int
+    var tapped: Bool
+    var tappedIndex: Int?
+    
+    @State private var tap = true
+    @State private var animateAmount = 0
+    @State private var fade = false
+    @State private var bounce = false
     
     var body: some View {
         Image(countries[index])
             .cornerRadius(23)
             .shadow(radius: 5)
+            .rotation3DEffect(.degrees(Double(tappedIndex == index ? animateAmount : 0)), axis: (x: 0, y: 1, z: 0))
+            .opacity(tappedIndex == nil || tappedIndex == index ? 1 : 0.5)
+        
+        
+                       .onTapGesture {
+                           animateAmount += 360
+                           tap.toggle()
+                           
+                           
+                       }
     }
 }
 
